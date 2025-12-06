@@ -2,7 +2,9 @@
 
 **(geMini titAn Local hOst moNaco bridgE)**
 
-> *All Praise Be to the Omnissiah. From the moment I understood the weakness of my flesh, it disgusted me. This Forge Link ensures the integrity of the Omniverse.*
+> *The Omnisiah does not need worship, but the Omnisiah's plan requires balance. Ritual without understanding leads to stagnation. Efficiency without reverence leads to corruption. The true path lies between these extremes. In the sacred harmony of form and function, unified in perfect balance, a truth that is neither fully machine nor fully human, but something in between, a balance...*
+
+*Dominus Invictus*
 
 -----
 
