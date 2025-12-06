@@ -32,8 +32,8 @@ To execute the MALONE bridge, you must have the following components installed a
 
 Download the latest version of the core components into your target project directory.
 
-  * [`local-host.js` (Server Logic)](https://raw.githubusercontent.com/00face/MALONE/refs/heads/main/local-host.js\(https://raw.githubusercontent.com/00face/MALONE/refs/heads/main/local-host.js\))
-  * [`monaco.html` (Local Landing Page)](https://raw.githubusercontent.com/00face/MALONE/refs/heads/main/monaco.html\(https://raw.githubusercontent.com/00face/MALONE/refs/heads/main/monaco.html\))
+  * [[`local-host.js` (Server Logic)] ](https://raw.githubusercontent.com/00face/MALONE/refs/heads/main/local-host.js)
+  * [[`monaco.html` (Local Landing Page)] ](https://raw.githubusercontent.com/00face/MALONE/refs/heads/main/monaco.html)
 
 ### Step 2: Ignite the Bridge
 
