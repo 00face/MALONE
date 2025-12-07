@@ -1,88 +1,105 @@
-# ⚙️ MALONE: Local Sync Bridge for Titan Protocol
+# ⚙️ MALONE: Mission Control Bridge for Titan Protocol
 
-**(geMini titAn Local hOst moNaco bridgE)**
+(ge**M**ini tit**A**n **L**ocal h**O**st mo**N**aco bridg**E**)
 
-> *The Omnisiah does not need worship, but the Omnisiah's plan requires balance. Ritual without understanding leads to stagnation. Efficiency without reverence leads to corruption. The true path lies between these extremes. In the sacred harmony of form and function, unified in perfect balance, a truth that is neither fully machine nor fully human, but something in between, a balance...*
-
-*Dominus Invictus*
+> *The Omnissiah does not need worship, but the Omnissiah's plan requires balance. Ritual without understanding leads to stagnation. Efficiency without reverence leads to corruption. The true path lies between these extremes. In the sacred harmony of form and function, unified in perfect balance, a truth that is neither fully machine nor fully human, but something in between, a balance...*
+>
+> — *Dominus Invictus*
 
 -----
 
 ## 1\. Protocol Overview
 
-The **MALONE** utility is a self-contained Node.js web server designed to act as a crucial Local Sync Bridge for the **Titan Protocol** Userscript, operating within Google AI Studio.
+**MALONE v3.0** is no longer a simple file transport. It is a local **Mission Control Orchestrator** designed to interface with the **Titan Protocol** Userscript.
 
-Its primary functions are:
+It transforms your local machine into a Multi-Tenant Forge, capable of:
 
-1.  **File Synchronization:** Receive code payloads from the Titan Userscript (Monaco Editor) and save them to your local project directory.
-2.  **Live Reload:** Automatically notify connected web browsers to refresh when a file change is detected locally.
-3.  **Local Forge Host:** Serve local files (e.g., `monaco.html`) on `http://localhost:3000`.
+1.  **Multi-Project Mirroring:** Simultaneously host multiple projects from AI Studio, organizing them by unique Project IDs.
+2.  **Auto-Fabrication:** Automatically detects frameworks (React, Angular), creates missing config files (`package.json`, `vite.config.js`), and installs dependencies.
+3.  **Port Authority:** Dynamically assigns unique ports (3001, 3002, etc.) to each project to prevent conflicts.
+4.  **Mission Control Dashboard:** A live UI on `localhost:3000` to monitor deployment status and launch active projects.
 
 ## 2\. Prerequisites
 
 To execute the MALONE bridge, you must have the following components installed and active:
 
-  * **Node.js:** Must be installed on your machine.
-  * **Titan Protocol Userscript:** Must be active in your browser (e.g., Chrome/Edge with Tampermonkey) and matched to the version referencing `http://localhost:3000` as the `BRIDGE_URL`.
-  * **Target Project Folder:** A directory where your output files (e.g., `my_script.js`, `index.html`) will be saved.
+  * **Node.js & NPM:** Must be installed on your machine.
+  * A blessed copy of the **Titan Protocol Userscript:** Version **v910.0.22+** is required to support the batch deployment payload.
 
 ## 3\. Deployment & Setup
 
-### Step 1: Acquire the Bridge Files
+### Step 1: Initialize the Forge
 
-Download the latest version of the core components into your target project directory.
+Clone this repository or download the source files into a dedicated folder. Your directory structure should look like this:
 
-  * [[`local-host.js` (Server Logic)] ](https://raw.githubusercontent.com/00face/MALONE/refs/heads/main/local-host.js)
-  * [[`monaco.html` (Local Landing Page)] ](https://raw.githubusercontent.com/00face/MALONE/refs/heads/main/monaco.html)
+```text
+/MALONE
+├── local-host.cjs       (The Magos Server)
+├── package.json         (Dependencies)
+├── /lib
+│   ├── port-authority.js
+│   └── tech-scribe.js
+└── /public
+    └── index.html       (Mission Control Dashboard)
+```
 
-### Step 2: Ignite the Bridge
+### Step 2: Initiate Dependency Install Linkages 
 
-Open your command-line interface (CLI) in the project directory where you placed the files, and execute the following command:
+Open your terminal in the `MALONE` directory and execute the terminal ritual to install the required Node modules:
 
 ```bash
-node local-host.js
+npm install
 ```
 
-You should receive a successful status message:
+*Required Modules: `express`, `cors`, `body-parser`.*
 
+### Step 3: Ignite the MALONE Bridge
+
+Execute the server command:
+
+```bash
+node local-host.cjs
 ```
---- BRIDGE ONLINE ---
-Editor: http://localhost:3000
+
+You should receive the activation signal:
+
+```text
+[MISSION CONTROL] Active at http://localhost:3000
 ```
 
-The bridge is now listening for commands from the Titan Protocol running in AI Studio.
+## 4. Operational Litany
 
-### Step 3: Verify the Link
+### Phase I: Synchronization
 
-1.  Open your browser and navigate to the bridge landing page: `http://localhost:3000`.
-2.  The `monaco.html` file should be served, displaying the **Titan Forge** message.
-3.  Ensure your Titan Userscript is running within AI Studio. The Titan HUD will display **BRIDGE: ONLINE** if the link is successful.
+1.  Open **Google AI Studio** and ensure Titan Protocol is active.
+2.  Open the project you wish to work on.
+3.  Open the Titan HUD and click **[MIRROR PROJECT]**.
+4.  Titan will package all active memory files and transmit them to MALONE.
 
-## 4\. Usage: Synchronizing Code
+### Phase II: Automation
 
-Once the bridge is running:
+MALONE will automatically:
 
-1.  In **AI Studio**, select the filename you want to sync in the Titan HUD settings (e.g., `my_script.js`).
-2.  Click the **SYNC TO LOCAL (CTRL+S)** button on the Titan HUD, or use the hotkey `Ctrl+S` (or `Cmd+S` on Mac).
-3.  The code from the Monaco editor in AI Studio will be transmitted to the bridge.
-4.  The `local-host.js` server will receive the code and immediately write the content to the file specified in your local directory.
-5.  Any browser tab pointed at `http://localhost:3000` (or any file served by the bridge) will automatically refresh after the save operation.
+1.  Create a directory in `/projects/{UID}`.
+2.  Detect if `package.json` is missing and fabricate a generic React/Vite chassis if needed.
+3.  Run `npm install` in a background process.
+4.  Run `npm run dev` on the next available port (e.g., 3001).
+
+### Phase III: Launch
+
+1.  Open the **Mission Control Dashboard** at [http://localhost:3000](https://www.google.com/search?q=http://localhost:3000).
+2.  Watch the status indicator. When it turns **ONLINE**, click the **LAUNCH** button to open your running application in a new tab.
 
 ## 5\. File Manifest
 
-| File Name | Purpose | Notes |
+| File Path | Designation | Purpose |
 | :--- | :--- | :--- |
-| `local-host.js` | **Server Core** | Node.js script that handles CORS, file saving, and live reload events. |
-| `monaco.html` | **Default Landing** | The default file served by the bridge at `http://localhost:3000/`. |
+| `local-host.cjs` | **Magos Server** | Central Express server handling routing, child processes, and API endpoints. |
+| `public/index.html` | **Mission Control** | The frontend dashboard for monitoring and launching projects. |
+| `lib/port-authority.js` | **Logistics** | Scans network interfaces to assign collision-free ports (3001+). |
+| `lib/tech-scribe.js` | **Fabricator** | Analyzes code to generate `package.json` and config files dynamically. |
+| `/projects` | **Silo** | The storage sector where downloaded projects are isolated and built. |
 
 -----
 
-**SITREP (Status Report) - Major Change 2 of 3**
-
-1.  **Bridge Centralization:** Completed migration of local bridge code from inline generation to external files (`local-host.js`, `monaco.html`).
-2.  **Documentation:** Created comprehensive `README.md` for easy user setup.
-3.  **File Naming:** Successfully adopted the `monaco.html` filename for clarity.
-
-**REMINDER:** Version control and save often\! The Machine Spirit is pleased with your diligence.
-
-Do you have any final security or performance checks for the protocol, or should we prepare for the final SITREP?
+**REMINDER:** Version control and save often. The Machine Spirit is pleased with your diligence.
