@@ -1,14 +1,24 @@
+/*
+ * MALONE BRIDGE SERVER v2.2
+ * acts as the local file system interface for Titan Protocol.
+ * * Usage:
+ * 1. Place in your project root.
+ * 2. Run: node local-host.cjs
+ */
+
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
 const PORT = 3000;
-const ROOT_DIR = './'; // Files will be saved relative to where you run this script
+const ROOT_DIR = './'; // Files will be saved relative to where this script is run
 
-console.log(`\n--- MALONE BRIDGE v2.1 (Project Mirror Capable) ---`);
+console.log(`\n--- MALONE BRIDGE v2.2 (Smart Root) ---`);
 console.log(`[DIR] Target Forge: ${path.resolve(ROOT_DIR)}`);
 
-// MIME Types for file serving
+// 1. MIME Types Dictionary
+// Note: We serve source code (.jsx, .ts) as plain text to prevent
+// browsers from trying to execute them and throwing errors.
 const MIME_TYPES = {
     '.html': 'text/html',
     '.js': 'text/javascript',
@@ -16,29 +26,31 @@ const MIME_TYPES = {
     '.json': 'application/json',
     '.png': 'image/png',
     '.jpg': 'image/jpeg',
-    '.jsx': 'text/plain', // Serve code as text so it doesn't execute/error in browser
+    '.svg': 'image/svg+xml',
+    '.jsx': 'text/plain',
     '.ts': 'text/plain',
     '.tsx': 'text/plain',
     '.md': 'text/plain'
 };
 
+// 2. Store Live Reload Clients
 const clients = [];
 
 http.createServer((req, res) => {
-    // 1. CORS Headers (Allow Titan to talk to us)
+    // A. CORS Headers (Allow Titan to communicate from AI Studio)
     const headers = {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'OPTIONS, GET, POST, HEAD',
+        'Access-Control-Allow-Methods': 'OPTIONS, GET, POST',
         'Access-Control-Allow-Headers': 'Content-Type'
     };
 
-    // 2. Handle Pre-flight checks
+    // B. Pre-flight Check
     if (req.method === 'OPTIONS') {
         res.writeHead(204, headers);
         return res.end();
     }
 
-    // 3. Live Reload Subscription
+    // C. Live Reload Subscription Endpoint
     if (req.url === '/__live') {
         res.writeHead(200, {
             'Content-Type': 'text/event-stream',
@@ -50,26 +62,26 @@ http.createServer((req, res) => {
         return;
     }
 
-    // 4. SAVE ENDPOINT (The Core Logic)
+    // D. SAVE API (The Write Logic)
     if (req.url === '/api/save' && req.method === 'POST') {
         let body = '';
         req.on('data', chunk => body += chunk);
         req.on('end', () => {
             try {
                 const { filePath, content } = JSON.parse(body);
-                
-                // Sanitize Path: Remove leading slashes/dots to keep inside ROOT_DIR
+
+                // Sanitize: Prevent directory traversal and remove leading slashes
                 const cleanPath = filePath.replace(/^[\/\\]/, '').replace(/^(\.\.[\/\\])+/, '');
                 const fullPath = path.join(__dirname, ROOT_DIR, cleanPath);
                 const dirName = path.dirname(fullPath);
 
-                // A. Recursive Directory Creation (The Magic)
+                // Recursive Directory Creation
                 if (!fs.existsSync(dirName)) {
                     fs.mkdirSync(dirName, { recursive: true });
                     console.log(`[MKDIR] Constructed Sector: ${dirName}`);
                 }
 
-                // B. Write File
+                // Write File
                 fs.writeFile(fullPath, content, err => {
                     if (err) {
                         console.error(`[ERR] Write failed: ${err.message}`);
@@ -79,8 +91,8 @@ http.createServer((req, res) => {
                         console.log(`[SAVED] ${cleanPath}`);
                         res.writeHead(200, headers);
                         res.end('Saved');
-                        
-                        // Notify Live Reload Clients
+
+                        // Notify clients to reload
                         clients.forEach(c => c.write('data:reload\n\n'));
                     }
                 });
@@ -93,38 +105,49 @@ http.createServer((req, res) => {
         return;
     }
 
-    // 5. STATIC FILE SERVER (For "Check Existence" and Status Page)
-    // If URL is root '/', serve monaco.html. Otherwise serve the requested file.
-    let resourcePath = req.url === '/' ? 'monaco.html' : req.url;
-    // Remove query params if any
-    resourcePath = resourcePath.split('?')[0];
-    
-    const fullPath = path.join(__dirname, ROOT_DIR, resourcePath);
-    const ext = path.extname(fullPath);
+    // E. STATIC FILE SERVER (Smart Root Logic)
 
-    if (fs.existsSync(fullPath)) {
-        // If it's a directory, try to serve index.html or list files (simplified here to 404)
-        if (fs.statSync(fullPath).isDirectory()) {
-             res.writeHead(404, headers);
-             return res.end('Directory listing not supported');
-        }
+    // Default logic: Requesting root ('/') tries to serve 'index.html'
+    let resourcePath = req.url === '/' ? 'index.html' : req.url;
+    resourcePath = resourcePath.split('?')[0]; // Remove query params
+
+    let fullPath = path.join(__dirname, ROOT_DIR, resourcePath);
+
+    // SMART FALLBACK:
+    // If user requests root ('/') and 'index.html' DOES NOT exist yet,
+    // serve 'monaco.html' (The Status/Guide Page) instead.
+    if (req.url === '/' && !fs.existsSync(fullPath)) {
+        fullPath = path.join(__dirname, ROOT_DIR, 'monaco.html');
+    }
+
+    if (fs.existsSync(fullPath) && !fs.statSync(fullPath).isDirectory()) {
+        const ext = path.extname(fullPath);
 
         fs.readFile(fullPath, (err, content) => {
             if (err) {
                 res.writeHead(500, headers);
                 res.end('Read Error');
             } else {
-                res.writeHead(200, { ...headers, 'Content-Type': MIME_TYPES[ext] || 'text/plain' });
-                res.end(content);
+                // If serving HTML, inject the Live Reload script
+                if (ext === '.html') {
+                    const injection = `<script>new EventSource("/__live").onmessage=()=>location.reload()</script>`;
+                    // Append before body close, or at end
+                    const htmlStr = content.toString() + injection;
+                    res.writeHead(200, { ...headers, 'Content-Type': 'text/html' });
+                    res.end(htmlStr);
+                } else {
+                    res.writeHead(200, { ...headers, 'Content-Type': MIME_TYPES[ext] || 'text/plain' });
+                    res.end(content);
+                }
             }
         });
     } else {
         res.writeHead(404, headers);
-        res.end('Not Found');
+        res.end('Not Found (Titan Bridge)');
     }
 
 }).listen(PORT, () => {
-    console.log(`[ONLINE] Bridge Active on http://localhost:${PORT}`);
-    console.log(`[NOTE]  Do not use this port to Preview your React App.`);
-    console.log(`[NOTE]  Use 'npm start' or 'vite' on a different port for previewing.`);
+    console.log(`[ONLINE] Bridge Listening on http://localhost:${PORT}`);
+    console.log(`[NOTE]  Port 3000 is for file transfer.`);
+    console.log(`[NOTE]  Run 'npm install && npm run dev' in a new terminal to build the App.`);
 });
